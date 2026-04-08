@@ -32,6 +32,8 @@ class AuthController{
             }else{
                 echo "el usuario no existe";
             }
+        }else{
+            require_once dirname(__DIR__, 2) . '/views/auth/login.php';
         }
     }
 
