@@ -1,6 +1,10 @@
 <?php
 //ESTE TROZO DE CODIGO FUE REALIZADO COMPLETAMENTE POR UNA IA, PERO ENTIENDO YO COMPLETAMENTE SU FUNCIONAMIENTO 
 // 1. Cargar configuraciones y la base de datos
+
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 require_once '../config/db_config.php';
 require_once '../app/Core/Database.php';
 

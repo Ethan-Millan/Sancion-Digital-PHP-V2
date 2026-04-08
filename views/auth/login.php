@@ -17,7 +17,7 @@
         <div class="card-body">
             <h3 class="text-center mb-4">Iniciar Sesión</h3>
             
-            <form action="<?php echo URL_PROJECT; ?>auth/login" method="POST">
+            <form action="<?php echo URL_PROJECT; ?>index.php?url=auth/login" method="POST">
                 
                 <div class="mb-3">
                     <label for="email" class="form-label">Correo Electrónico</label>
