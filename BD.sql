@@ -11,7 +11,7 @@ CREATE TABLE usuarios (
     matricula VARCHAR(20) NOT NULL UNIQUE, 
     nombre VARCHAR(255) NOT NULL,
     apellido_paterno VARCHAR(255) NOT NULL,
-    apellido_materno VARCHAR(255) NOT NULL,
+    apellido_materno VARCHAR(255) NULL,
     correo_electronico VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     rol_id INT,
@@ -44,18 +44,5 @@ CREATE TABLE sanciones (
     FOREIGN KEY (codigo_falta_id) REFERENCES codigo_faltas(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-INSERT INTO roles (nombre_rol) VALUES 
-('Administrador'), 
-('Vigilante'), 
-('Alumno');
 
-INSERT INTO usuarios (matricula, nombre, apellido_paterno, apellido_materno, correo_electronico, password, rol_id) VALUES 
-('ADM001', 'Ethan', 'Millan', 'Admin', 'admin@escuela.edu.mx', '12345', 1), -- Admin
-('VIG001', 'Juan', 'Perez', 'Guardia', 'vigilante@escuela.edu.mx', '12345', 2), -- Vigilante
-('ALU001', 'Diego', 'Hernandez', 'Lopez', 'alumno@escuela.edu.mx', '12345', 3); -- Alumno
-
-INSERT INTO codigo_faltas (nombre_falta, descripcion, horas_sancion) VALUES 
-('Basura', 'Tirar desechos fuera de los contenedores', 2),
-('Grafiti', 'Rayar paredes o mobiliario', 4),
-('Fumar', 'Fumar dentro de las instalaciones', 10);
 

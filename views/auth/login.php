@@ -1,40 +1,41 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sanción Digital</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f9fa; }
-        .login-container { margin-top: 100px; max-width: 400px; }
-    </style>
-</head>
-<body>
+<?php 
+  require_once __DIR__ . '/../layout/header.php'; 
+?>
 
-<div class="container login-container">
-    <div class="card shadow">
-        <div class="card-body">
-            <h3 class="text-center mb-4">Iniciar Sesión</h3>
+<main class="flex-grow flex items-center justify-center bg-gray-100 p-6">
+    
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Iniciar Sesión</h2>
+
+        <form action="<?php echo URL_PROJECT; ?>index.php?url=auth/login" method="POST" class="space-y-4">
             
-            <form action="<?php echo URL_PROJECT; ?>index.php?url=auth/login" method="POST">
-                
-                <div class="mb-3">
-                    <label for="email" class="form-label">Correo Electrónico</label>
-                    <input type="email" name="email" class="form-control" id="email" required>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="password" class="form-label">Contraseña</label>
-                    <input type="password" name="password" class="form-control" id="password" required>
-                </div>
-                
-                <button type="submit" class="btn btn-primary w-100">Entrar</button>
-            </form>
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                <input type="email" name="email" id="email" required
+                       class="w-full mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
             
-        </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <input type="password" name="password" id="password" required
+                       class="w-full mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <button type="submit" 
+                    class="w-full bg-gray-800 text-white py-2 px-4 rounded-md hover:bg-gray-500 font-semibold transition shadow">
+                Entrar
+            </button>
+
+        </form>
+
+        <p class="text-center text-sm text-gray-500 mt-4">
+            ¿No tienes cuenta? 
+            <a href="<?php echo URL_PROJECT; ?>index.php?url=auth/register" class="text-blue-600 hover:underline">Regístrate</a>
+        </p>
     </div>
-</div>
+</main>
 
-</body>
-</html>
+<?php 
+  require_once __DIR__ . '/../layout/footer.php'; 
+?>

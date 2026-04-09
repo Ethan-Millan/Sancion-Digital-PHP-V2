@@ -23,15 +23,14 @@ class AuthController{
                 return;
             }
 
-            // 3. Ahora sí armamos los datos (Fíjate en los CORCHETES [])
             $datos = [
                 'matricula'          => trim($_POST['matricula']),
                 'nombre'             => trim($_POST['nombre']),
                 'apellido_paterno'   => trim($_POST['apellido_paterno']),
-                'apellido_materno'   => trim($_POST['apellido_materno']), // Corregido () por []
-                'correo_electronico' => trim($_POST['correo_electronico']), // Corregido () por []
+                'apellido_materno'   => trim($_POST['apellido_materno']), 
+                'correo_electronico' => trim($_POST['correo_electronico']), 
                 'password'           => password_hash($password_plain, PASSWORD_DEFAULT),
-                'rol_id'             => 1
+                'rol_id'             => (int)$_POST['rol_id']
             ];
 
             if($this->userModel->Register($datos)){
@@ -43,7 +42,7 @@ class AuthController{
             }
 
         } else {
-            require_once dirname(__DIR__, 2) . 'index.php?url=home/index';
+            require_once dirname(__DIR__, 2) . '/views/auth/registro.php';
         }
     }
 
@@ -70,7 +69,7 @@ class AuthController{
                 echo "el usuario no existe";
             }
         }else{
-            require_once dirname(__DIR__, 2) . 'index.php?url=home/index';
+            require_once dirname(__DIR__, 2) . '/views/auth/login.php';
         }
     }
 
