@@ -4,7 +4,7 @@ USE sancion_digital_php_v2;
 CREATE TABLE roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_rol VARCHAR(255) NOT NULL UNIQUE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB; 
 
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
