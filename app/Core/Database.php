@@ -1,5 +1,7 @@
 <?php
 
+use App\Exceptions\DatabaseException;
+
 class Database{
     private $host = DB_HOST;
     private $db_name = DB_NAME;
@@ -16,7 +18,7 @@ class Database{
                 $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         }catch(PDOException $e){
-            echo 'Connection Error: ' . $e->getMessage();
+            throw new DatabaseException('Connection Error: ' . $e->getMessage());
         }
 
         return $this->conn;
