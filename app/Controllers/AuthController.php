@@ -25,6 +25,18 @@ class AuthController{
                 if($password_plain !== $password_confirm){
                     throw new ValidationException('Las contraceñas no coinciden');
                 }
+                
+                if(empty($_POST['matricula']) || mb_strlen($_POST['matricula'], 'UTF-8') != 10){
+                    throw new ValidationException('La matricula es obligatoria y tiene que terner 10 caracteres');
+                }
+
+                if(empty($_POST['nombre']) || empty($_POST['apellido_paterno'])){
+                    throw new ValidationException('Nombre o apellidos paterno no pueden estar vacios');
+                }
+
+                if(empty($_POST['correo_electronico']) || !filter_var($_POST['correo_electronico'], FILTER_VALIDATE_EMAIL)){
+                    throw new ValidationException('El correo electronico no puede estar vacio o no tiene el formato correcto');
+                }
 
                 $datos = [
                     'matricula'          => trim($_POST['matricula']),
