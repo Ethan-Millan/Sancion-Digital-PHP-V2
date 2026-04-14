@@ -5,6 +5,18 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+
+spl_autoload_register(function($class) {
+    // Convierte App\Exceptions\ValidationException 
+    // en ../app/Exceptions/ValidationException.php
+    $class = str_replace('App\\', '', $class);
+    $class = str_replace('\\', '/', $class);
+    $path = '../app/' . $class . '.php';
+    if(file_exists($path)){
+        require_once $path;
+    }
+});
+
 require_once '../config/db_config.php';
 require_once '../app/Core/Database.php';
 

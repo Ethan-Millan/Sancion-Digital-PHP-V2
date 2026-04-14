@@ -12,7 +12,7 @@
   <?php unset($_SESSION['error']);?>
   <?php endif?>
     <?php if(isset($_SESSION['success'])): ?>
-    <div class= 'error'><?= $_SESSION['success'] ?>?></div>
+    <div class= 'error'><?= $_SESSION['success'] ?></div>
   <?php unset($_SESSION['success']);?>
   <?php endif?>
   <div class="bg-gray-900 p-4 flex shadow border-b border-gray-700 text-white justify-between items-center">
