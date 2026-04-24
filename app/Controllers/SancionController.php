@@ -1,21 +1,22 @@
 <?php
 
 use App\Exceptions\ValidationException;
-use App\Exceptions\DatabaseException
+use App\Exceptions\DatabaseException;
 
 require_once '../app/Models/Sancion.php';
-use Symfony\Component\HttpKernel\HttpCache\Store;
-
 require_once '../app/Models/Multas.php';
+require_once '../app/Models/Usuarios.php';
 
 class SancionController{
     
     private $sancionModel;
     private $multaModel;
+    private $usuariosModel;
 
     public function __construct($db){
         $this->sancionModel = new Sancion($db);
         $this->multaModel = new Multas($db);
+        $this->usuariosModel = new Usuarios($db);
     }
 
     public function store_validation(){
@@ -23,7 +24,7 @@ class SancionController{
             $errores = [];
             $sanciones = $_POST['sancion'];
 
-            if($_SERVER['POST'] == 'POST'){
+            if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 if(empty($sanciones)){
                     throw new ValidationException('No se pueden enviar formularios vacios.');
                 }
@@ -33,20 +34,24 @@ class SancionController{
                         $errores[] = 'La matriculas no pueden estar vacias ';
                     }
 
-                    if(!$this->sancionModel->BuscarUsuario($datos['alumno_matricula'])){
+                    $alumno = $this->usuariosModel->BuscarUsuario($datos['alumno_matricula'],$datos['id_alumno']);
+
+                    if(!$alumno){
                         $errores[] = 'El alumno no existe';
                     }
+                    
+                    $vigilante = $this->usuariosModel->BuscarUsuario($datos['vigilante_matricula'], $datos['id_vigilante']);
 
-                    if(!$this->sancionModel->BuscarUsuario($datos['vigilante_matricula'])){
+                    if(!$vigilante){
                         $errores[] = 'El vigilante no existe';
                     }
                     
-                    if(!$this->multaModel->BuscarMulta(id)){
+                    if(!$this->multaModel->BuscarMulta($datos['codigo_falta_id'])){
                         $errores[] = 'La multa no existe';
                     }
 
                     if(empty($datos['observaciones'])){
-                        $errores = 'Las observaciones no pueden estar vacias';
+                        $errores[] = 'Las observaciones no pueden estar vacias';
                     }
 
                 }
