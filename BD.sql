@@ -36,7 +36,7 @@ CREATE TABLE sanciones (
     codigo_falta_id INT NOT NULL,
     status ENUM('pendiente', 'en_progreso', 'cumplida', 'cancelada') DEFAULT 'pendiente',
     fecha_reporte DATE NOT NULL,
-    observaciones TEXT,
+    observaciones TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
     FOREIGN KEY (alumno_id) REFERENCES usuarios(id) ON DELETE CASCADE,
