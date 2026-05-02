@@ -82,25 +82,53 @@ class SancionController{
     }
 
     private function store($sanciones){
-        foreach($sanciones  as $sancion){
-            if(!$this->sancionModel->store($sancion)){
-                $_SESSION['error'] = 'Fallo al crear la sancion';
-                header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
-                exit;
+        try{
+            foreach($sanciones  as $sancion){
+                if(!$this->sancionModel->store($sancion)){
+                    $_SESSION['error'] = 'Fallo al crear la sancion';
+                    header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
+                    exit;
+                }
             }
-        }
 
-        $_SESSION['success'] = 'Sancion creada con exito';
-        header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
-        exit;
+            $_SESSION['success'] = 'Sancion creada con exito';
+            header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
+            exit;
+        }catch(DatabaseException $e){
+            die('Error técnico: ' . $e->getMessage());
+        }
     }
 
     public function update(){
-
+        
     }
 
-    public function delete(){
+    public function delete(int $id){
+        try{
+            // 1. Validar si el registro existe antes de intentar operar
+            if(!$this->sancionModel->findById($id)){
+                throw new ValidationException('La sancion que intentas eliminar no existe.');
+            }
 
+            // 2. Intentar la eliminación
+            if(!$this->sancionModel->delete($id)){
+                throw new DatabaseException('No se pudo completar la eliminación en la base de datos.');
+            }
+            
+            $_SESSION['success'] = 'Sancion eliminada con exito';
+            header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
+            exit;
+
+        }catch(ValidationException $e){
+            $_SESSION['error'] = $e->getMessage();
+            header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
+            exit;
+        }catch(DatabaseException $e){
+            die('Error técnico: ' . $e->getMessage());
+        }
     }
+
+
+    
 
 }

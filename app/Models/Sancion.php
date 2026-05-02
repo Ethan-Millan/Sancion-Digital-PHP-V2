@@ -20,4 +20,17 @@ class Sancion{
         ]);
     }
 
+    public function findById($id){
+        $sql = "SELECT id FROM sanciones WHERE id = :id LIMIT 1;";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_OBJ);
+    }
+
+    public function delete($id_sancion){
+        $sql = "DELETE FROM sanciones WHERE id = :id_sancion;";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id_sancion' => $id_sancion]);
+        return $stmt->rowCount() > 0;
+    }
 }
