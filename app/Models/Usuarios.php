@@ -35,4 +35,17 @@ class Usuarios{
             ':rol_id' => $datos['rol_id']
         ]);
     }
+
+    public function BuscarUsuario($matricula_usaurio, $id_rol_usuario) : int{
+        $sql = "SELECT id FROM usuarios WHERE matricula = :matricula_usuario AND role_id = :id_rol_usuario";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([':matricula_usuario' => $matricula_usaurio,':id_rol_usuario' => $id_rol_usuario]);
+        
+        $resultado = $stmt->fetchColumn();
+
+        return $resultado ? (int)$resultado : 0;
+        //se retorna con fetch column la primera columna de la consulta en este caso id aunque de porsi no afecta pq la consulta solo retorna el id pero es delas formas mas limpias de ahcerlo 
+    }
 }

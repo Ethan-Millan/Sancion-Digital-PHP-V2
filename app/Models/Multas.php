@@ -47,4 +47,15 @@ class Multas{
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':id' => $id]);
     }
+
+    public function BuscarMulta(int $id): bool{
+
+        $sql = "SELECT 1 from codigo_faltas where id = :id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        
+        return $stmt->rowCount() > 0;
+        
+    }
 }
