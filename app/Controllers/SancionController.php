@@ -13,11 +13,34 @@ class SancionController{
     private $multaModel;
     private $usuariosModel;
     private $errores = [];
+    private $db;
+
 
     public function __construct($db){
+        $this->db = $db;//Conexion a la BD
+
         $this->sancionModel = new Sancion($db);
         $this->multaModel = new Multas($db);
         $this->usuariosModel = new Usuarios($db);
+    }
+
+    private function redirectWithSuccess($message){
+        $_SESSION['success'] = $message;
+        header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
+        exit;
+    }
+    
+
+    private function redirectWithError($message){
+        $_SESSION['error'] = $message;
+        header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
+        exit;
+    }
+
+    private function redirectWithErrorValidation($messages,$ruta_formulario){
+        $_SESSION['error'] = $messages;
+        header('Location: ' . URL_PROJECT . 'index.php?url=sancion/' . $ruta_formulario);
+        exit;
     }
 
     public function store(){
@@ -30,27 +53,28 @@ class SancionController{
                 }
 
                 if($this->validaciones($sanciones_format = $this->formatData($sanciones))){
+                    
+                    $this->db->beginTransaction();
+                    
+
                     foreach($sanciones_format  as $sancion){
                         if(!$this->sancionModel->store($sancion)){
-                            $_SESSION['error'] = 'Fallo al crear la sancion';
-                            header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
-                            exit;
+                            throw new DatabaseException('Error al crear la sancion en la base de datos.');
                         }
                     }
 
-                    $_SESSION['success'] = 'Sancion creada con exito';
-                    header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
-                    exit;
+                    $this->db->commit();
+                    $this->redirectWithSuccess('Sancion creada con exito');
                 }else{
                     throw new ValidationException('Se cuanta con lo siguientes errores: ' . implode(', ',  $this->errores));
                 }
             }
         }catch(ValidationException $e){
-            $_SESSION['error'] = $e->getMessage();
-            header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
-            exit;
+            $this->redirectWithErrorValidation($e->getMessage(),'store');
+        
         }catch(DatabaseException $e){
-            die('Error técnico: ' . $e->getMessage());
+            $this->db->rollback();
+            $this->redirectWithError('Error técnico: ' . $e->getMessage());
         }
     }
 
@@ -64,11 +88,10 @@ class SancionController{
             }
 
         }catch(ValidationException $e){
-            $_SESSION['error'] = $e->getMessage();
-            header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
-            exit;
+            $this->redirectWithErrorValidation($e->getMessage(), 'update');
+
         }catch(DatabaseException $e){
-            die('Error técnico: ' . $e->getMessage());
+            $this->redirectWithError('Error técnico: ' . $e->getMessage());
         }
     
     }
@@ -85,21 +108,19 @@ class SancionController{
                 throw new DatabaseException('No se pudo completar la eliminación en la base de datos.');
             }
             
-            $_SESSION['success'] = 'Sancion eliminada con exito';
-            header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
-            exit;
+            $this->redirectWithSuccess('Sancion eliminada con exito');
+
 
         }catch(ValidationException $e){
-            $_SESSION['error'] = $e->getMessage();
-            header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
-            exit;
+            $this->redirectWithErrorValidation($e->getMessage(), 'delete');
+
         }catch(DatabaseException $e){
-            die('Error técnico: ' . $e->getMessage());
+            $this->redirectWithError('Error técnico: ' . $e->getMessage());
         }
     }
-    //FUNCION PARA DAR FORMATO A LSO DATOS 
+    //FUNCION PARA DAR FORMATO A LOS DATOS 
     private function formatData($sanciones){
-        foreach($sanciones as $sancion => $datos){
+        foreach($sanciones as $sancion => &$datos){
             $datos['id_alumno'] = trim($datos['id_alumno']);
             $datos['alumno_matricula'] = trim($datos['alumno_matricula']); 
             $datos['id_vigilante'] = trim($datos['id_vigilante']);
@@ -117,7 +138,7 @@ class SancionController{
         foreach($sanciones as $sancion => $datos){
 
             if(empty($datos['alumno_matricula']) || empty($datos['vigilante_matricula'])){//Verifica que las matricuals no esten vacias 
-                $errores[] = 'La matriculas no pueden estar vacias ';//si estan vacias gaurda el error 
+                $this->errores[] = 'La matriculas no pueden estar vacias ';//si estan vacias gaurda el error 
                 continue;//Si este error existe no vale la pena continuar con el resto asi que se salta al proximo cilo del foreach
             }
 
@@ -125,27 +146,27 @@ class SancionController{
             //Busca al usaurio en la base de datos validando que su matricula pertenezca a su id 
 
             if(!$alumno){
-                $errores[] = 'El alumno no existe';
+                $this->errores[] = 'El alumno no existe';
             }
             
             $vigilante = $this->usuariosModel->BuscarUsuario($datos['vigilante_matricula'], $datos['id_vigilante']);
             //Busca al vigilante en la base de datos validando que su matriual pertenezca a su id 
 
             if(!$vigilante){
-                $errores[] = 'El vigilante no existe';
+                $this->errores[] = 'El vigilante no existe';
             }
             
             if(!$this->multaModel->BuscarMulta($datos['codigo_falta_id'])){
-                $errores[] = 'La multa no existe';
+                $this->errores[] = 'La multa no existe';
             }
 
             if(empty($datos['observaciones'])){
-                $errores[] = 'Las observaciones no pueden estar vacias';
+                $this->errores[] = 'Las observaciones no pueden estar vacias';
             }
 
         }
 
-        if(!empty($errores)){
+        if(!empty($this->errores)){
             return false;
         }
         
