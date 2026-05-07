@@ -36,16 +36,20 @@ class Usuarios{
         ]);
     }
 
-    public function BuscarUsuario($matricula_usaurio, $id_rol_usuario) : int{
-        $sql = "SELECT id FROM usuarios WHERE matricula = :matricula_usuario AND role_id = :id_rol_usuario";
+    public function validarInvolucrados($matricula_alumno, $id_rol_alumno, $matricula_vigilante, $id_rol_vigilante){
+        $sql = "SELECT 
+                    (SELECT COUNT(*) FROM usuarios WHERE matricula = :matricula_alumno AND rol_id = :id_rol_alumno) AS alumno,
+                    (SELECT COUNT(*) FROM usuarios WHERE matricula = :matricula_vigilante AND rol_id = :id_rol_vigilante) AS vigilante";
 
         $stmt = $this->db->prepare($sql);
 
-        $stmt->execute([':matricula_usuario' => $matricula_usaurio,':id_rol_usuario' => $id_rol_usuario]);
-        
-        $resultado = $stmt->fetchColumn();
+        $stmt->execute([
+            ':matricula_alumno' => $matricula_alumno,
+            ':id_rol_alumno' => $id_rol_alumno,
+            ':matricula_vigilante' => $matricula_vigilante,
+            ':id_rol_vigilante' => $id_rol_vigilante
+        ]);
 
-        return $resultado ? (int)$resultado : 0;
-        //se retorna con fetch column la primera columna de la consulta en este caso id aunque de porsi no afecta pq la consulta solo retorna el id pero es delas formas mas limpias de ahcerlo 
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

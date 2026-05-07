@@ -117,7 +117,7 @@ class SancionController{
 
 
         }catch(ValidationException $e){
-            $this->redirectWithErrorValidation($e->getMessage(), 'update');
+            $this->redirectWithErrorValidation($e->getMessage(), 'update', $id);
 
         }catch(DatabaseException $e){
             $this->db->rollback();
@@ -171,24 +171,25 @@ class SancionController{
                 $this->errores[] = 'La matriculas no pueden estar vacias ';//si estan vacias gaurda el error 
                 continue;//Si este error existe no vale la pena continuar con el resto asi que se salta al proximo cilo del foreach
             }
-
-            $alumno = $this->usuariosModel->BuscarUsuario($datos['alumno_matricula'],$datos['id_alumno']);
-            //Busca al usaurio en la base de datos validando que su matricula pertenezca a su id 
-
-            if(!$alumno){
-                $this->errores[] = 'El alumno no existe';
-            }
             
-            $vigilante = $this->usuariosModel->BuscarUsuario($datos['vigilante_matricula'], $datos['id_vigilante']);
-            //Busca al vigilante en la base de datos validando que su matriual pertenezca a su id 
+            $involucrados = $this->usuariosModel->validarInvolucrados(
+                $datos['alumno_matricula'],
+                $datos['id_alumno'],
+                $datos['vigilante_matricula'],
+                $datos['id_vigilante']
+            );
 
-            if(!$vigilante){
-                $this->errores[] = 'El vigilante no existe';
+            if($involucrados['alumno'] == 0){
+                $this->errores[] = 'El alumno no existe' . $datos['alumno_matricula'];
             }
-            
+
+            if($involucrados['vigilante'] == 0){
+                $this->errores[] = 'El vigilante no existe' . $datos['vigilante_matricula'];
+            }
+
             if(!$this->multaModel->BuscarMulta($datos['codigo_falta_id'])){
                 $this->errores[] = 'La multa no existe';
-            }
+            }                                                                                                             
 
             if(empty($datos['observaciones'])){
                 $this->errores[] = 'Las observaciones no pueden estar vacias';
