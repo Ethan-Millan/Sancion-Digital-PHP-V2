@@ -43,10 +43,16 @@ if (file_exists($controllerPath)) {
     // Instanciamos el controlador (ejemplo: new AuthController($db))
     $controller = new $controllerName($db);
 
-    // 5. Verificar si el método existe dentro de esa clase
+// 5. Verificar si el método existe dentro de esa clase
     if (method_exists($controller, $method)) {
-        // Ejecutamos la acción (ejemplo: $controller->login())
-        $controller->$method();
+        
+        // Agarramos todos los pedazos de la URL desde la posición 2 en adelante
+        // Si la URL es sancion/update/5, $params será un array con un solo elemento: [5]
+        $params = array_slice($parts, 2);
+
+        // Ejecutamos la acción pasándole los parámetros "desempaquetados" (los 3 puntitos)
+        $controller->$method(...$params);
+
     } else {
         echo "Error 404: El método '$method' no existe en $controllerName.";
     }

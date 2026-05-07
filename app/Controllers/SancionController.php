@@ -24,22 +24,25 @@ class SancionController{
         $this->usuariosModel = new Usuarios($db);
     }
 
-    private function redirectWithSuccess($message){
+    private function redirectWithSuccess($message){//Aplicando DRY (Don't Repeat Yourself)
         $_SESSION['success'] = $message;
         header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
         exit;
     }
     
 
-    private function redirectWithError($message){
+    private function redirectWithError($message){//Aplicando DRY (Don't Repeat Yourself)
         $_SESSION['error'] = $message;
         header('Location: ' . URL_PROJECT . 'index.php?url=sancion/index');
         exit;
     }
 
-    private function redirectWithErrorValidation($messages,$ruta_formulario){
+    private function redirectWithErrorValidation($messages,$ruta_formulario, $id = null){// El id esta vacio por defecto para no afectar funcioenes como store o delete
         $_SESSION['error'] = $messages;
-        header('Location: ' . URL_PROJECT . 'index.php?url=sancion/' . $ruta_formulario);
+        
+        $extraURL = !empty($id) ? '/' . $id : '';// se valida si $id esta vacio para retornar el id si no no 
+
+        header('Location: ' . URL_PROJECT . 'index.php?url=sancion/' . $ruta_formulario . $extraURL);// se redirecciona con los parametros
         exit;
     }
 
@@ -52,45 +55,72 @@ class SancionController{
                     throw new ValidationException('No se pueden enviar formularios vacios.');//Valida que el array no venga vacio
                 }
 
-                if($this->validaciones($sanciones_format = $this->formatData($sanciones))){
-                    
-                    $this->db->beginTransaction();
-                    
-
-                    foreach($sanciones_format  as $sancion){
-                        if(!$this->sancionModel->store($sancion)){
-                            throw new DatabaseException('Error al crear la sancion en la base de datos.');
-                        }
-                    }
-
-                    $this->db->commit();
-                    $this->redirectWithSuccess('Sancion creada con exito');
-                }else{
-                    throw new ValidationException('Se cuanta con lo siguientes errores: ' . implode(', ',  $this->errores));
+                if(!$this->validaciones($sanciones_format = $this->formatData($sanciones))){
+                    throw new ValidationException('Se cuenta con los siguientes errores: ' . implode(', ',  $this->errores));
                 }
+                    
+                $this->db->beginTransaction();//Se inicia la transaccion
+                
+
+                foreach($sanciones_format  as $sancion){
+                    if(!$this->sancionModel->store($sancion)){
+                        throw new DatabaseException('Error al crear la sancion en la base de datos.');
+                    }
+                }
+
+                $this->db->commit();//Se hace el commit si todo salio bien en la bd 
+                $this->redirectWithSuccess('Sancion creada con exito');
             }
         }catch(ValidationException $e){
             $this->redirectWithErrorValidation($e->getMessage(),'store');
         
         }catch(DatabaseException $e){
-            $this->db->rollback();
+            $this->db->rollback();//Se hace un rollback si algo salio mal 
             $this->redirectWithError('Error técnico: ' . $e->getMessage());
         }
     }
 
 
     public function update(int $id){
-        
+        /*Se hace exactamente lo mismo que en store solo que se valida si la sancion ya existe, ademas de cambiar el store por el update*/
         try{
 
             if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 
+                $sanciones = $_POST['sancion'] ?? [];
+
+                if(empty($sanciones)){
+                    throw new ValidationException('No se pueden enviar formularios vacios.');
+                }
+                
+
+                if(!$this->sancionModel->findById($id)){
+                    throw new ValidationException('La sancion que intentas actualizar no existe.');
+                }
+
+                if(!$this->validaciones($sanciones_format = $this->formatData($sanciones))){
+                    throw new ValidationException('Se cuenta con los siguientes errores: ' . implode(', ',  $this->errores));
+                }
+                    
+                $this->db->beginTransaction();
+                
+
+                foreach($sanciones_format  as $sancion){
+                    if(!$this->sancionModel->update($id,$sancion)){
+                        throw new DatabaseException('Error al modificar la sancion en la base de datos.');
+                    }
+                }
+
+                $this->db->commit();
+                $this->redirectWithSuccess('Sancion modificada con exito');
             }
+
 
         }catch(ValidationException $e){
             $this->redirectWithErrorValidation($e->getMessage(), 'update');
 
         }catch(DatabaseException $e){
+            $this->db->rollback();
             $this->redirectWithError('Error técnico: ' . $e->getMessage());
         }
     
