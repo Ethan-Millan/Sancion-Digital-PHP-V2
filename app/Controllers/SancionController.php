@@ -172,18 +172,18 @@ class SancionController{
                 continue;//Si este error existe no vale la pena continuar con el resto asi que se salta al proximo cilo del foreach
             }
             
-            $involucrados = $this->usuariosModel->validarInvolucrados(
+            $involucrados = $this->usuariosModel->validarRolesYMatriculas(
                 $datos['alumno_matricula'],
-                $datos['id_alumno'],
+                3,
                 $datos['vigilante_matricula'],
-                $datos['id_vigilante']
+                2
             );
 
-            if($involucrados['alumno'] == 0){
+            if($involucrados['alumno_valido'] == 0){
                 $this->errores[] = 'El alumno no existe' . $datos['alumno_matricula'];
             }
 
-            if($involucrados['vigilante'] == 0){
+            if($involucrados['vigilante_valido'] == 0){
                 $this->errores[] = 'El vigilante no existe' . $datos['vigilante_matricula'];
             }
 

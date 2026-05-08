@@ -36,18 +36,18 @@ class Usuarios{
         ]);
     }
 
-    public function validarInvolucrados($matricula_alumno, $id_rol_alumno, $matricula_vigilante, $id_rol_vigilante){
+    public function validarRolesYMatriculas($matricula_alumno, $rol_esperado_alumno, $matricula_vigilante, $rol_esperado_vigilante){
         $sql = "SELECT 
-                    (SELECT COUNT(*) FROM usuarios WHERE matricula = :matricula_alumno AND rol_id = :id_rol_alumno) AS alumno,
-                    (SELECT COUNT(*) FROM usuarios WHERE matricula = :matricula_vigilante AND rol_id = :id_rol_vigilante) AS vigilante";
+                    (SELECT COUNT(*) FROM usuarios WHERE matricula = :mat_alumno AND rol_id = :rol_alumno) AS alumno_valido,
+                    (SELECT COUNT(*) FROM usuarios WHERE matricula = :mat_vigilante AND rol_id = :rol_vigilante) AS vigilante_valido";
 
         $stmt = $this->db->prepare($sql);
 
         $stmt->execute([
-            ':matricula_alumno' => $matricula_alumno,
-            ':id_rol_alumno' => $id_rol_alumno,
-            ':matricula_vigilante' => $matricula_vigilante,
-            ':id_rol_vigilante' => $id_rol_vigilante
+            ':mat_alumno'      => $matricula_alumno,
+            ':rol_alumno'      => $rol_esperado_alumno,   
+            ':mat_vigilante'   => $matricula_vigilante,
+            ':rol_vigilante'   => $rol_esperado_vigilante  
         ]);
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
