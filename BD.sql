@@ -4,24 +4,33 @@ USE sancion_digital_php_v2;
 CREATE TABLE roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_rol VARCHAR(255) NOT NULL UNIQUE
-) ENGINE=InnoDB; 
+) ENGINE=InnoDB;
+
+CREATE TABLE programa_educativo(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_carrera VARCHAR(255) NOT NULL,
+    clave_carrera VARCHAR(10) NOT NULL
+) ENGINE=InnoDB;
 
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    matricula VARCHAR(20) NOT NULL UNIQUE, 
+    matricula VARCHAR(20) NOT NULL UNIQUE,
     nombre VARCHAR(255) NOT NULL,
     apellido_paterno VARCHAR(255) NOT NULL,
     apellido_materno VARCHAR(255) NULL,
     correo_electronico VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     rol_id INT,
+    status ENUM('activo', 'inactivo') DEFAULT 'activo',
+    id_carrera INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (rol_id) REFERENCES roles(id) ON DELETE SET NULL
+    FOREIGN KEY (rol_id) REFERENCES roles(id) ON DELETE SET NULL,
+    FOREIGN KEY (id_carrera) REFERENCES programa_educativo(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE codigo_faltas (
-    id INT AUTO_INCREMENT PRIMARY KEY, 
+    id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_falta VARCHAR(255) NOT NULL UNIQUE,
     descripcion TEXT,
     horas_sancion INT NOT NULL DEFAULT 1,
@@ -38,11 +47,25 @@ CREATE TABLE sanciones (
     fecha_reporte DATE NOT NULL,
     observaciones TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (alumno_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (vigilante_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (codigo_falta_id) REFERENCES codigo_faltas(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+CREATE TABLE categoria(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL
 
+);
 
+CREATE TABLE avisos(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    fecha DATE NOT NULL,
+    id_categoria INT NOT NULL,
+    descripcion VARCHAR(255) NOT NULL,
+    id_usuario INT NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_categoria) REFERENCES categoria(id) ON DELETE CASCADE
+);
